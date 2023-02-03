@@ -1,0 +1,104 @@
+import streamlit as st
+from utils import (
+    parse_docx,
+    parse_pdf,
+    parse_txt,
+    search_docs,
+    embed_docs,
+    text_to_docs,
+    get_answer,
+    get_sources,
+    wrap_text_in_html,
+)
+from openai.error import OpenAIError
+
+
+def clear_submit():
+    st.session_state["submit"] = False
+
+
+def set_openai_api_key(api_key: str):
+    st.session_state["OPENAI_API_KEY"] = api_key
+
+
+st.set_page_config(page_title="YogaTherapyAdvisor", page_icon="🧘", layout="wide")
+st.header("🧘Yoga Therapy Advisor")
+
+with st.sidebar:
+    st.markdown("# About")
+    st.header(
+        "🙋Ask questions about what ails you "
+        "and get instant answers from "
+        "trusted sources with citations"
+    )
+    st.markdown(
+        "This tool is a work in progress. "
+        "You can contribute to the project on [GitHub](https://github.com/aurotripathy/yoga_therapy_advisor) "
+        "with your feedback and suggestions💡"
+    )
+    st.markdown("---")
+    st.markdown(
+        "## How to use\n"
+        "1. Enter your [OpenAI API key](https://platform.openai.com/account/api-keys) below🔑\n"
+        "2. Ask a question what ails you💬\n"
+    )
+    api_key_input = st.text_input(
+        "OpenAI API Key",
+        type="password",
+        placeholder="Paste your OpenAI API key here (sk-...)",
+        help="You can get your API key from https://platform.openai.com/account/api-keys.",
+        value=st.session_state.get("OPENAI_API_KEY", ""),
+    )
+
+    if api_key_input:
+        set_openai_api_key(api_key_input)
+
+    st.markdown("---")
+    st.markdown("Made by [mmz_001](https://twitter.com/mm_sasmitha)")
+
+
+index = None
+
+query = st.text_area("Ask a question about what ails you", on_change=clear_submit)
+with st.expander("Advanced Options"):
+    show_all_chunks = st.checkbox("Show all chunks retrieved from vector search")
+    show_full_doc = st.checkbox("Show parsed contents of the document")
+
+if show_full_doc and doc:
+    with st.expander("Document"):
+        # Hack to get around st.markdown rendering LaTeX
+        st.markdown(f"<p>{wrap_text_in_html(doc)}</p>", unsafe_allow_html=True)
+
+button = st.button("Submit")
+if button or st.session_state.get("submit"):
+    if not st.session_state.get("api_key_configured"):
+        st.error("Please configure your OpenAI API key!")
+    elif not index:
+        st.error("Please upload a document!")
+    elif not query:
+        st.error("Please enter a question!")
+    else:
+        st.session_state["submit"] = True
+        # Output Columns
+        answer_col, sources_col = st.columns(2)
+        sources = search_docs(index, query)
+
+        try:
+            answer = get_answer(sources, query)
+            if not show_all_chunks:
+                # Get the sources for the answer
+                sources = get_sources(answer, sources)
+
+            with answer_col:
+                st.markdown("#### Answer")
+                st.markdown(answer["output_text"].split("SOURCES: ")[0])
+
+            with sources_col:
+                st.markdown("#### Sources")
+                for source in sources:
+                    st.markdown(source.page_content)
+                    st.markdown(source.metadata["source"])
+                    st.markdown("---")
+
+        except OpenAIError as e:
+            st.error(e._message)
