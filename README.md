@@ -1,8 +1,8 @@
 <h1 align="center">
-📖KnowledgeGPT
+🧘YogaTherapyAdvisor
 </h1>
 
-Accurate answers and instant citations for your documents.
+Accurate answers and instant citations for your yoga therapy questions.
 
 ## 🔧 Features
 
@@ -38,3 +38,6 @@ streamlit run main.py
 - Highlight relevant phrases in citations 🔦
 - Support scanned documents with OCR 📝
 - More customization options (e.g. chain type 🔗, chunk size📏, etc.)
+
+## Note
+Attribution: This repo has be built after cloning from KnowledgeGPT
