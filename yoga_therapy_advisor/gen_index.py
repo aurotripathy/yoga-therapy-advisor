@@ -37,7 +37,7 @@ index = embed_docs(text)
 print(f'saving...')
 index.save_local('./saved_index')
 print(f'loading...')
-index.save_local('./saved_index')
+index.load_local('./saved_index')
 
 
 
