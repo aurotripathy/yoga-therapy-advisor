@@ -11,6 +11,21 @@ from utils import (
     wrap_text_in_html,
 )
 from openai.error import OpenAIError
+from langchain.vectorstores import FAISS
+
+from gpt_index import (
+    GPTListIndex,
+    SimpleWebPageReader,
+    BeautifulSoupWebReader,
+    GPTSimpleVectorIndex
+)
+
+# from IPython.display import Markdown, display
+from langchain.agents import load_tools, Tool, initialize_agent
+from langchain.llms import OpenAI
+from langchain.agents import ZeroShotAgent, Tool, AgentExecutor
+from langchain.agents import initialize_agent, Tool
+from langchain import OpenAI, LLMChain
 
 
 def clear_submit():
@@ -19,6 +34,11 @@ def clear_submit():
 
 def set_openai_api_key(api_key: str):
     st.session_state["OPENAI_API_KEY"] = api_key
+
+# Creating your Langchain Agent
+def querying_db(query: str):
+  response = index.query(query, verbose=True)
+  return response
 
 
 st.set_page_config(page_title="YogaTherapyAdvisor", page_icon="🧘", layout="wide")
@@ -42,22 +62,31 @@ with st.sidebar:
         "1. Enter your [OpenAI API key](https://platform.openai.com/account/api-keys) below🔑\n"
         "2. Ask a question what ails you💬\n"
     )
-    api_key_input = st.text_input(
-        "OpenAI API Key",
-        type="password",
-        placeholder="Paste your OpenAI API key here (sk-...)",
-        help="You can get your API key from https://platform.openai.com/account/api-keys.",
-        value=st.session_state.get("OPENAI_API_KEY", ""),
-    )
+    # api_key_input = st.text_input(
+    #     "OpenAI API Key",
+    #     type="password",
+    #     placeholder="Paste your OpenAI API key here (sk-...)",
+    #     help="You can get your API key from https://platform.openai.com/account/api-keys.",
+    #     value=st.session_state.get("OPENAI_API_KEY", ""),
+    # )
 
-    if api_key_input:
-        set_openai_api_key(api_key_input)
+    # if api_key_input:
+    #     set_openai_api_key(api_key_input)
 
+    api_key_input = True
+    set_openai_api_key("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")
+
+    
     st.markdown("---")
     st.markdown("Made by [mmz_001](https://twitter.com/mm_sasmitha)")
 
 
-index = None
+#load
+print(f'Loading the indexes...')
+index = GPTSimpleVectorIndex.load_from_disk("../tests/doc_qa.json")
+print(f'Done loading the indexes.')
+st.session_state["api_key_configured"] = True
+
 
 query = st.text_area("Ask a question about what ails you", on_change=clear_submit)
 with st.expander("Advanced Options"):
@@ -81,24 +110,26 @@ if button or st.session_state.get("submit"):
         st.session_state["submit"] = True
         # Output Columns
         answer_col, sources_col = st.columns(2)
-        sources = search_docs(index, query)
+
+        tools = [
+            Tool(
+                name = "QueryingDB",
+                func=querying_db,
+                description="This function takes a query string \
+                as input and returns the most relevant answer \
+                from the documentation as output"
+            )]
+        llm = OpenAI(temperature=0)
+
+
+        agent = initialize_agent(tools, llm, agent="zero-shot-react-description", verbose=True)
+        result = agent.run(query)
+        print(result)
 
         try:
-            answer = get_answer(sources, query)
-            if not show_all_chunks:
-                # Get the sources for the answer
-                sources = get_sources(answer, sources)
-
             with answer_col:
                 st.markdown("#### Answer")
-                st.markdown(answer["output_text"].split("SOURCES: ")[0])
-
-            with sources_col:
-                st.markdown("#### Sources")
-                for source in sources:
-                    st.markdown(source.page_content)
-                    st.markdown(source.metadata["source"])
-                    st.markdown("---")
+                st.markdown(result)
 
         except OpenAIError as e:
             st.error(e._message)
