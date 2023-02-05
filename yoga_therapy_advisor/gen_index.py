@@ -3,7 +3,6 @@ from utils import (
     parse_pdf,
     parse_txt,
     search_docs,
-    embed_docs,
     text_to_docs,
     get_answer,
     get_sources,
@@ -18,7 +17,7 @@ import os
 
 openai_api_key = os.environ["OPENAI_API_KEY"]
 
-def embed_docs(docs: List[Document]) -> VectorStore:
+def simple_embed_docs(docs: List[Document]) -> VectorStore:
     """Embeds a list of Documents and returns a FAISS index
        Deals with the OpenAI API key externally (ebv var)
     """
@@ -33,9 +32,16 @@ def embed_docs(docs: List[Document]) -> VectorStore:
 file_to_be_indexed = '/media/auro/Dropbox/My Ideas/yoga advisor/OCRed/Chapters/Chapter 1 - Therapeutic Yoga and Its Essentials.docx'
 
 text = text_to_docs(file_to_be_indexed)
-index = embed_docs(text)
+print(text)
+
+index = simple_embed_docs(text)
+print(index)
+
 print(f'saving...')
 index.save_local('./saved_index')
+
+
+
 print(f'loading...')
 index.load_local('./saved_index')
 
