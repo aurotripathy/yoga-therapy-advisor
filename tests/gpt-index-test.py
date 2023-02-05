@@ -9,7 +9,11 @@ from langchain import OpenAI, LLMChain
 Input_URL = "https://docs.custody.coinbase.com/#introduction" 
 documents = SimpleWebPageReader(html_to_text=True).load_data([Input_URL])
 index = GPTSimpleVectorIndex(documents)
+
+#save
 index.save_to_disk("./doc_qa.json")
+
+#load
 index2 = GPTSimpleVectorIndex.load_from_disk("./doc_qa.json")
 
 # Creating your Langchain Agent
