@@ -1,15 +1,15 @@
+import os
+import openai
 import streamlit as st
-from utils import (
-    parse_docx,
-    parse_pdf,
-    parse_txt,
-    search_docs,
-    embed_docs,
-    text_to_docs,
-    get_answer,
-    get_sources,
-    wrap_text_in_html,
-)
+# from utils import (
+#     parse_docx,
+#     parse_pdf,
+#     parse_txt,
+#     text_to_docs,
+#     get_answer,
+#     get_sources,
+#     wrap_text_in_html,
+# )
 from openai.error import OpenAIError
 from langchain.vectorstores import FAISS
 
@@ -27,6 +27,7 @@ from langchain.agents import ZeroShotAgent, Tool, AgentExecutor
 from langchain.agents import initialize_agent, Tool
 from langchain import OpenAI, LLMChain
 
+openai.api_key = os.environ["OPENAI_API_KEY"]
 
 def clear_submit():
     st.session_state["submit"] = False
@@ -74,7 +75,7 @@ with st.sidebar:
     #     set_openai_api_key(api_key_input)
 
     api_key_input = True
-    set_openai_api_key("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")
+    set_openai_api_key(openai.api_key)
 
     
     st.markdown("---")
