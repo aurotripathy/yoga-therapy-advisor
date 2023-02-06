@@ -58,7 +58,7 @@ def gen_sidebar():
         set_openai_api_key(openai.api_key)
 
         st.markdown("---")
-        st.markdown("Made by [mmz_001](https://twitter.com/mm_sasmitha)")
+        st.markdown("Made by [auro tripathy](https://www.linkedin.com/in/aurotripathy/)")
 
     
 # Creating your Langchain Agent
