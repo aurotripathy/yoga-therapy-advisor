@@ -1,15 +1,7 @@
 import os
 import openai
 import streamlit as st
-# from utils import (
-#     parse_docx,
-#     parse_pdf,
-#     parse_txt,
-#     text_to_docs,
-#     get_answer,
-#     get_sources,
-#     wrap_text_in_html,
-# )
+
 from openai.error import OpenAIError
 from langchain.vectorstores import FAISS
 
@@ -63,26 +55,14 @@ with st.sidebar:
         "1. Enter your [OpenAI API key](https://platform.openai.com/account/api-keys) below🔑\n"
         "2. Ask a question what ails you💬\n"
     )
-    # api_key_input = st.text_input(
-    #     "OpenAI API Key",
-    #     type="password",
-    #     placeholder="Paste your OpenAI API key here (sk-...)",
-    #     help="You can get your API key from https://platform.openai.com/account/api-keys.",
-    #     value=st.session_state.get("OPENAI_API_KEY", ""),
-    # )
 
-    # if api_key_input:
-    #     set_openai_api_key(api_key_input)
-
-    api_key_input = True
+    api_key_input = True  # Forced
     set_openai_api_key(openai.api_key)
-
     
     st.markdown("---")
     st.markdown("Made by [mmz_001](https://twitter.com/mm_sasmitha)")
 
 
-#load
 print(f'Loading the indexes...')
 index = GPTSimpleVectorIndex.load_from_disk("../tests/doc_qa.json")
 print(f'Done loading the indexes.')
