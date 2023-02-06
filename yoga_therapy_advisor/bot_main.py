@@ -4,7 +4,6 @@ import streamlit as st
 from streamlit_chat import message
 
 from openai.error import OpenAIError
-from langchain.vectorstores import FAISS
 
 from gpt_index import (
     GPTListIndex,
@@ -81,12 +80,12 @@ gen_sidebar()
 print(f'Loading the indexes...')
 index = GPTSimpleVectorIndex.load_from_disk("../tests/doc_qa.json")
 print(f'Done loading the indexes.')
+
 st.session_state["api_key_configured"] = True
 
 query = get_text()
 
 if query:
-
     st.session_state["submit"] = True
     # Output Columns
     answer_col, sources_col = st.columns(2)
