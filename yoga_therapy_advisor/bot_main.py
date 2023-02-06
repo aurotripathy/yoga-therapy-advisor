@@ -12,11 +12,13 @@ from gpt_index import (
     GPTSimpleVectorIndex
 )
 
-from langchain.agents import load_tools, Tool, initialize_agent
+from langchain.agents import Tool, initialize_agent
 from langchain.llms import OpenAI
-from langchain.agents import ZeroShotAgent, Tool, AgentExecutor
-from langchain.agents import initialize_agent, Tool
+from langchain.agents import ZeroShotAgent, AgentExecutor
 from langchain import OpenAI, LLMChain
+
+
+vector_index_file = "../indexes/doc_qa.json"
 
 st.set_page_config(page_title="YogaTherapyAdvisor", page_icon="🧘", layout="wide")
 st.header("🧘Yoga Therapy Advisor")
@@ -27,11 +29,8 @@ if 'generated' not in st.session_state:
 if 'past' not in st.session_state:
     st.session_state['past'] = []
 
-openai.api_key = os.environ["OPENAI_API_KEY"]    
-
-
-def set_openai_api_key(api_key: str):
-    st.session_state["OPENAI_API_KEY"] = api_key
+def set_openai_api_key():
+    st.session_state["OPENAI_API_KEY"] = os.environ["OPENAI_API_KEY"]
 
 
 def gen_sidebar():
@@ -55,7 +54,7 @@ def gen_sidebar():
         )
 
         api_key_input = True  # Forced
-        set_openai_api_key(openai.api_key)
+        set_openai_api_key()
 
         st.markdown("---")
         st.markdown("Made by [auro tripathy](https://www.linkedin.com/in/aurotripathy/)")
@@ -78,7 +77,7 @@ def get_text():
 gen_sidebar()
 
 print(f'Loading the indexes...')
-index = GPTSimpleVectorIndex.load_from_disk("../tests/doc_qa.json")
+index = GPTSimpleVectorIndex.load_from_disk(vector_index_file)
 print(f'Done loading the indexes.')
 
 st.session_state["api_key_configured"] = True
