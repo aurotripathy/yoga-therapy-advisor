@@ -12,13 +12,8 @@ logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
 from pudb import set_trace
 
-index_file = "../indexes/yoga_qa.json"
-index2 = GPTSimpleVectorIndex.load_from_disk(index_file)
-
-# Creating your Langchain Agent
-def querying_db(query: str):
-  response = index2.query(query, verbose=True)
-  return response
+index_file = "../vector-indexes/yoga_qa.json"
+index = GPTSimpleVectorIndex.load_from_disk(index_file)
 
 tools = [
     Tool(
@@ -29,15 +24,31 @@ tools = [
     ),
 ]
 
-set_trace()
+# set_trace()
 memory = ConversationBufferMemory(memory_key="chat_history")
 llm=OpenAI(temperature=0)
-agent_chain = initialize_agent(tools, llm, agent="conversational-react-description", memory=memory)
+agent_chain = initialize_agent(tools, llm, verbose=True, agent="conversational-react-description", memory=memory)
 
 
 # Test your agent by asking it a question
-query_string = "What's the difference between yoga therapy and modern medicine?" 
+# query_string = "What's the difference between yoga therapy and modern medicine?" 
 # query_string = "What are the various food categories in yoga?" 
 
+
+# query_string = "Hello, my name is Bob. Remember it." 
+# result = agent_chain.run(query_string)
+
+query_string = "From the text provided, what are the three food categories in yoga?" 
+set_trace()
+
+print(f'What the query to index returns:\n{index.query(query_string)}')
+      
 result = agent_chain.run(query_string)
-print(result)
+
+query_string = "What is Sattvic food?" 
+result = agent_chain.run(query_string)
+
+# query_string = "What's me name?" 
+# result = agent_chain.run(query_string)
+
+
