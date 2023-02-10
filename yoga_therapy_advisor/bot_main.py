@@ -68,6 +68,7 @@ def gen_sidebar():
 def querying_db(query: str):
   # response = index.query(query, verbose=True)
   response = index.query(query)
+  print(f'Response to query:\n {response}')
   return response
     
 
