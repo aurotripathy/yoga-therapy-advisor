@@ -7,8 +7,6 @@ from openai.error import OpenAIError
 
 from gpt_index import (
     GPTListIndex,
-    SimpleWebPageReader,
-    BeautifulSoupWebReader,
     GPTSimpleVectorIndex
 )
 
@@ -17,8 +15,14 @@ from langchain.llms import OpenAI
 from langchain.agents import ZeroShotAgent, AgentExecutor
 from langchain import OpenAI, LLMChain
 
+import logging
+import sys
 
-vector_index_file = "../indexes/doc_qa.json"
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
+
+
+vector_index_file = "../vector-indexes/yoga_qa.json"
 
 st.set_page_config(page_title="YogaTherapyAdvisor", page_icon="🧘", layout="wide")
 st.header("🧘Yoga Therapy Advisor")
@@ -62,14 +66,15 @@ def gen_sidebar():
     
 # Creating your Langchain Agent
 def querying_db(query: str):
-  response = index.query(query, verbose=True)
+  # response = index.query(query, verbose=True)
+  response = index.query(query)
   return response
     
 
 def get_text():
     c1, c2, c3 = st.columns([1, 4, 4])  # This moves the input box to the right
     with c3:
-        input_text = st.text_input("You: ","Hello, how are you?", key="input")
+        input_text = st.text_input("You: ", "Hello, how are you?", key="input")
     return input_text 
 
 
@@ -90,10 +95,17 @@ if query:
     answer_col, sources_col = st.columns(2)
 
     tools = [
+        # Tool(
+        #     name = "QueryingDB",
+        #     func=querying_db,
+        #     description="This function takes a query string \
+        #     as input and returns the most relevant answer \
+        #     from the documentation as output"
+        # )]
         Tool(
             name = "QueryingDB",
             func=querying_db,
-            description="This function takes a query string \
+            description="Always do this function first. This function takes a query string \
             as input and returns the most relevant answer \
             from the documentation as output"
         )]
