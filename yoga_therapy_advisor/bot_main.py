@@ -14,15 +14,13 @@ from langchain.agents import Tool, initialize_agent
 from langchain.llms import OpenAI
 from langchain.agents import ZeroShotAgent, AgentExecutor
 from langchain import OpenAI, LLMChain
+from langchain.chains.conversation.memory import ConversationBufferMemory
 
 import logging
 import sys
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
-
-
-vector_index_file = "../vector-indexes/yoga_qa.json"
 
 st.set_page_config(page_title="YogaTherapyAdvisor", page_icon="🧘", layout="wide")
 st.header("🧘Yoga Therapy Advisor")
@@ -83,6 +81,7 @@ def get_text():
 gen_sidebar()
 
 print(f'Loading the indexes...')
+vector_index_file = "../vector-indexes/yoga_qa.json"
 index = GPTSimpleVectorIndex.load_from_disk(vector_index_file)
 print(f'Done loading the indexes.')
 
@@ -104,16 +103,18 @@ if query:
         #     from the documentation as output"
         # )]
         Tool(
-            name = "QueryingDB",
-            func=querying_db,
-            description="Always do this function first. This function takes a query string \
-            as input and returns the most relevant answer \
-            from the documentation as output"
+            name = "GPT Index",
+            func=lambda q: str(index.query(q)),
+            description="Always, you must query the index first. Te tool is useful when you want to answer questions from indexed text.",
+        return_direct=True            
         )]
+    memory = ConversationBufferMemory(memory_key="chat_history")
     llm = OpenAI(temperature=0)
 
 
-    agent = initialize_agent(tools, llm, agent="zero-shot-react-description", verbose=True)
+    agent = initialize_agent(tools, llm, agent="conversational-react-description",
+                             memory=memory,
+                             verbose=True)
     result = agent.run(query)
     print(f'Result: {result}')
 
