@@ -14,8 +14,8 @@ Accurate answers and instant citations for your yoga therapy questions.
 1. Clone the repository📂
 
 ```bash
-git clone https://github.com/mmz-001/knowledge_gpt
-cd knowledge_gpt
+git clone https://aurotripathy/yoga-therapy-advisor
+cd yoga-therapy-advisor
 ```
 
 2. Install dependencies with [Poetry](https://python-poetry.org/) and activate virtual environment🔨
@@ -28,10 +28,10 @@ poetry shell
 3. Run the Streamlit server🚀
 
 ```bash
-cd knowledge_gpt
+cd yoga-therapy-advisor
 streamlit run bot_main.py
 ```
-For DEBUG mode, use 
+In run in DEBUG mode, use: 
 
 ```
 streamlit run bot_main.py --logger.level=debug
@@ -39,7 +39,6 @@ streamlit run bot_main.py --logger.level=debug
 
 ## 🚀 Upcoming Features
 
-- Add support for more formats (e.g. webpages 🕸️, PPTX 📊, etc.)
 - Highlight relevant phrases in citations 🔦
 - Support scanned documents with OCR 📝
 - More customization options (e.g. chain type 🔗, chunk size📏, etc.)
