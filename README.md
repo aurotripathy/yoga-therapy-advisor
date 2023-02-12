@@ -29,7 +29,12 @@ poetry shell
 
 ```bash
 cd knowledge_gpt
-streamlit run main.py
+streamlit run bot_main.py
+```
+For DEBUG mode, use 
+
+```
+streamlit run bot_main.py --logger.level=debug
 ```
 
 ## 🚀 Upcoming Features
