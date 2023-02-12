@@ -1,5 +1,10 @@
+import logging
+import sys
+
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
+
 import os
-import openai
 import streamlit as st
 from streamlit_chat import message
 
@@ -12,15 +17,9 @@ from gpt_index import (
 
 from langchain.agents import Tool, initialize_agent
 from langchain.llms import OpenAI
-from langchain.agents import ZeroShotAgent, AgentExecutor
-from langchain import OpenAI, LLMChain
+# from langchain import OpenAI
 from langchain.chains.conversation.memory import ConversationBufferMemory
 
-import logging
-import sys
-
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
-logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
 
 st.set_page_config(page_title="YogaTherapyAdvisor", page_icon="🧘", layout="wide")
 st.header("🧘Yoga Therapy Advisor")
@@ -63,11 +62,11 @@ def gen_sidebar():
 
     
 # Creating your Langchain Agent
-def querying_db(query: str):
-  # response = index.query(query, verbose=True)
-  response = index.query(query)
-  print(f'Response to query:\n {response}')
-  return response
+# def querying_db(query: str):
+#   # response = index.query(query, verbose=True)
+#   response = index.query(query)
+#   print(f'Response to query:\n {response}')
+#   return response
     
 
 def get_text():
@@ -94,20 +93,23 @@ if query:
     # Output Columns
     answer_col, sources_col = st.columns(2)
 
+    # tools = [
+    #     Tool(
+    #         name = "GPT Index",
+    #         func=lambda q: str(index.query(q)),
+    #         description="Always, you must query the index first. This tool is useful when you want to answer questions from indexed text.",
+    #         return_direct=True            
+    #     ),]
+
     tools = [
-        # Tool(
-        #     name = "QueryingDB",
-        #     func=querying_db,
-        #     description="This function takes a query string \
-        #     as input and returns the most relevant answer \
-        #     from the documentation as output"
-        # )]
         Tool(
             name = "GPT Index",
             func=lambda q: str(index.query(q)),
-            description="Always, you must query the index first. Te tool is useful when you want to answer questions from indexed text.",
-        return_direct=True            
-        )]
+            description="useful for when you want to answer questions from indexed text. Always, you must try the index first.",
+            return_direct=True
+        ),
+    ]
+
     memory = ConversationBufferMemory(memory_key="chat_history")
     llm = OpenAI(temperature=0)
 
