@@ -3,6 +3,7 @@ import sys
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
+logger = logging.getLogger(__name__)
 
 import os
 import streamlit as st
@@ -61,28 +62,20 @@ def gen_sidebar():
         st.markdown("Made by [auro tripathy](https://www.linkedin.com/in/aurotripathy/)")
 
     
-# Creating your Langchain Agent
-# def querying_db(query: str):
-#   # response = index.query(query, verbose=True)
-#   response = index.query(query)
-#   print(f'Response to query:\n {response}')
-#   return response
-    
-
 def get_text():
     c1, c2, c3 = st.columns([1, 4, 4])  # This moves the input box to the right
     with c3:
-        input_text = st.text_input("You: ", "Hello, how are you?", key="input")
+        input_text = st.text_input("You: ", placeholder="Ask me a question about yoga therapy and health.", key="input")        
     return input_text 
 
 
 #main
 gen_sidebar()
 
-print(f'Loading the indexes...')
+logger.info(f'Loading the indexes...')
 vector_index_file = "../vector-indexes/yoga_qa.json"
 index = GPTSimpleVectorIndex.load_from_disk(vector_index_file)
-print(f'Done loading the indexes.')
+logger.info(f'Done loading the indexes.')
 
 st.session_state["api_key_configured"] = True
 
@@ -93,19 +86,11 @@ if query:
     # Output Columns
     answer_col, sources_col = st.columns(2)
 
-    # tools = [
-    #     Tool(
-    #         name = "GPT Index",
-    #         func=lambda q: str(index.query(q)),
-    #         description="Always, you must query the index first. This tool is useful when you want to answer questions from indexed text.",
-    #         return_direct=True            
-    #     ),]
-
     tools = [
         Tool(
             name = "GPT Index",
             func=lambda q: str(index.query(q)),
-            description="useful for when you want to answer questions from indexed text. Always, you must try the index first.",
+            description="Useful for when you want to answer questions about yoga. As an assistant, you must always use this tool first, no exceptions.",
             return_direct=True
         ),
     ]
