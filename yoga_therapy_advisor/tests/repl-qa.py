@@ -15,7 +15,7 @@ def create_prompt(user_input):
     return {"role": "user", "content": user_input}
 
 
-def create_context_and_prompt(messages, context, prompt):
+def append_context_and_prompt(messages, context, prompt):
     messages.append(context)
     messages.append(prompt)
     return messages
@@ -35,15 +35,14 @@ response = ''
 
 #use a while loop to continuously prompt the user for input until they enter a '--quit' or equivalent
 while user_input not in quit_words:
-    user_input = input("Enter a string of text for the assistant (or type '--quit' to exit): ")
-    #process the user input
+    user_input = input("Enter a question for the assistant (or type '--quit' to exit): ")
+    
     if user_input not in quit_words:
         print("You entered: ", user_input)
 
     prompt = create_prompt(user_input)
     context = create_context(response)
-    messages = create_context_and_prompt(messages, context, prompt)
+    messages = append_context_and_prompt(messages, context, prompt)
     response = get_response_from_GPT(messages)
     print(response)
     
-
