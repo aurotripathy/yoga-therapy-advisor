@@ -50,11 +50,10 @@ user_input = ""
 response = ""
 is_stateful = get_is_stateful()
 
-# use a while loop to continuously prompt the user for input until they enter a '--quit' or equivalent
+# use a while loop to continuously prompt the user for input 
+# until the user enters a '--quit' or equivalent
 while user_input not in quit_words:
-    user_input = input(
-        "Enter a question for the assistant (or type '--quit' to exit): "
-    )
+    user_input = input("Enter a question for the assistant (or type '--quit' to exit): ")
 
     if user_input not in quit_words:
         print(f'"You entered: ", {user_input}')
